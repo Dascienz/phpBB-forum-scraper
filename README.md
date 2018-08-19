@@ -3,9 +3,9 @@ Python-based scraper for phpBB forums.
 
 Code requires: 
 
-    1. Python scraping library, [Scrapy.]: http://scrapy.org/
+1. Python scraping library, [Scrapy](http://scrapy.org/).
     
-    2. Python HTML parsing library, [BeautifulSoup.]: https://www.crummy.com/software/BeautifulSoup/bs4/doc/
+2. Python HTML parsing library, [BeautifulSoup](https://www.crummy.com/software/BeautifulSoup/bs4/doc/).
 
 
 ## Scraper Output
@@ -24,13 +24,13 @@ Scrapes the following information from forum posts:
 
 Edit `phpBB.py` and specify:
 
-    1. `allowed_domains`
+1. `allowed_domains`
     
-    2. `start_urls`
+2. `start_urls`
     
-    3. `username` & `password`
+3. `username` & `password`
     
-    4. `forum_login=False` or `forum_login=True`
+4. `forum_login=False` or `forum_login=True`
 
 ## Instructions:
 From within `/phpBB_scraper/`:
