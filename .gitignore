@@ -1,4 +1,12 @@
+# Exclude Files
 *.DS_Store
 *.csv
 *.json
 *.txt
+*.tsv
+*.xls
+*.xlsx
+
+# Exclude Directories
+__pycache__/
+.ipynb_checkpoints/

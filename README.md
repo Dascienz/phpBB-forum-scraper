@@ -38,3 +38,5 @@ From within `/phpBB_scraper/`:
 `scrapy crawl phpBB` to launch the crawler.
 
 `scrapy crawl phpBB -o posts.csv` to launch the crawler and save results to CSV.
+
+NOTE: Please adjust `settings.py` to throttle your requests.
