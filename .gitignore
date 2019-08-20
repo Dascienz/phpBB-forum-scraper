@@ -6,6 +6,7 @@
 *.tsv
 *.xls
 *.xlsx
+*.pyc
 
 # Exclude Directories
 __pycache__/
