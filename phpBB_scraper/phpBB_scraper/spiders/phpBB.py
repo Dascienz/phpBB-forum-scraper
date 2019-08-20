@@ -56,7 +56,7 @@ class PhpbbSpider(scrapy.Spider):
         soup = BeautifulSoup(string, 'lxml')
         block_quotes = soup.find_all('blockquote')
         for i, quote in enumerate(block_quotes):
-            block_quotes[i] = '<quote-%s>=' + str(i) + quote.get_text()
+            block_quotes[i] = '<quote-%s>='%str(i+1) + quote.get_text()
         return ''.join(block_quotes)
     
     def clean_text(self, string):
@@ -65,7 +65,7 @@ class PhpbbSpider(scrapy.Spider):
         soup = BeautifulSoup(string, 'lxml')
         for tag in tags:
             for i, item in enumerate(soup.find_all(tag)):
-                item.replaceWith('<reply-%s>=' + str(i))
+                item.replaceWith('<reply-%s>='%str(i+1))
         return re.sub(r' +', r' ', soup.get_text())
       
     def parse_posts(self, response):
