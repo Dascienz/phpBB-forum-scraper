@@ -7,10 +7,12 @@ from scrapy.http import Request
 class PhpbbSpider(scrapy.Spider):
     
     name = 'phpBB'
+    #Domain only, no urls
     allowed_domains = ['']
     start_urls = ['']
     username = ''
     password = ''
+    # False if you dont need to login, true if you do.
     form_login = False
     
     def parse(self, response):
@@ -22,7 +24,8 @@ class PhpbbSpider(scrapy.Spider):
                                                              formdata=formdata,
                                                              callback=self.after_login,
                                                              dont_click=True)]
-            return form_request
+            yield form_request
+            return
         else:
             # REQUEST SUB-FORUM TITLE LINKS
             links = response.xpath('//a[@class="forumtitle"]/@href').extract()
