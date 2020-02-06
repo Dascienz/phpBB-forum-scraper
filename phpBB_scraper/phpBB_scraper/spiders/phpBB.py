@@ -4,26 +4,30 @@ import scrapy
 from bs4 import BeautifulSoup
 from scrapy.http import Request
 
+
 class PhpbbSpider(scrapy.Spider):
     
     name = 'phpBB'
-    #Domain only, no urls
+    # Domain only, no urls
     allowed_domains = ['']
     start_urls = ['']
     username = ''
     password = ''
-    # False if you dont need to login, true if you do.
+    # False if you don't need to login, True if you do.
     form_login = False
     
     def parse(self, response):
         # LOGIN TO PHPBB BOARD AND CALL AFTER_LOGIN
         if self.form_login:
-            formdata = {'username': self.username, 
-                        'password': self.password}
-            form_request = [scrapy.FormRequest.from_response(response,
-                                                             formdata=formdata,
-                                                             callback=self.after_login,
-                                                             dont_click=True)]
+            formdata = {'username': self.username, 'password': self.password}
+            form_request = [
+                scrapy.FormRequest.from_response(
+                    response,
+                    formdata=formdata,
+                    callback=self.after_login,
+                    dont_click=True
+                )
+            ]
             yield form_request
             return
         else:
@@ -59,7 +63,7 @@ class PhpbbSpider(scrapy.Spider):
         soup = BeautifulSoup(string, 'lxml')
         block_quotes = soup.find_all('blockquote')
         for i, quote in enumerate(block_quotes):
-            block_quotes[i] = '<quote-%s>='%str(i+1) + quote.get_text()
+            block_quotes[i] = '<quote-%s>=%s' % (str(i + 1), quote.get_text())
         return ''.join(block_quotes)
     
     def clean_text(self, string):
@@ -68,7 +72,7 @@ class PhpbbSpider(scrapy.Spider):
         soup = BeautifulSoup(string, 'lxml')
         for tag in tags:
             for i, item in enumerate(soup.find_all(tag)):
-                item.replaceWith('<reply-%s>='%str(i+1))
+                item.replaceWith('<reply-%s>=' % str(i + 1))
         return re.sub(r' +', r' ', soup.get_text())
       
     def parse_posts(self, response):
@@ -80,13 +84,15 @@ class PhpbbSpider(scrapy.Spider):
         post_quotes = [self.clean_quote(s) for s in post_texts]
         post_texts = [self.clean_text(s) for s in post_texts]
 
-        #YIELD POST DATA
+        # YIELD POST DATA
         for i in range(len(usernames)):
-            yield {'Username': usernames[i],
-                   'PostCount': post_counts[i],
-                   'PostTime': post_times[i],
-                   'PostText': post_texts[i],
-                   'QuoteText': post_quotes[i]}
+            yield {
+                'Username': usernames[i],
+                'PostCount': post_counts[i],
+                'PostTime': post_times[i],
+                'PostText': post_texts[i],
+                'QuoteText': post_quotes[i]
+            }
         
         # CLICK THROUGH NEXT PAGE
         next_link = response.xpath('//li[@class="next"]//a[@rel="next"]/@href').extract_first()
