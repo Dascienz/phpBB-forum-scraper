@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import re
-import json
 import scrapy
 from bs4 import BeautifulSoup
 from scrapy.http import Request
