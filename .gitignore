@@ -10,5 +10,7 @@
 !requirements.txt
 
 # Exclude Directories
+.idea/
+.vscode/
 __pycache__/
 .ipynb_checkpoints/
