@@ -2,7 +2,7 @@
 
 Python-based web scraper for phpBB forums. Project can be used as a template for building your own
 custom Scrapy spiders or for one-off crawls on designated forums. Please keep in mind that aggressive crawls
-can contribute significant strain on web servers, so please throttle your request rates.
+can produce significant strain on web servers, so please throttle your request rates.
 
 
 ## Requirements: 
