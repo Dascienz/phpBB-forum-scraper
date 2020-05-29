@@ -6,9 +6,9 @@ from scrapy.http import Request
 
 # TODO: Please provide values for the following variables
 # Domains only, no urls
-ALLOWED_DOMAINS = ['filosofiki.eu']
+ALLOWED_DOMAINS = ['']
 # Starting urls
-START_URLS = ['http://www.filosofiki.eu/viewforum.php?f=67&sid=17575a200a6f183f559b696701c4ea20']
+START_URLS = ['']
 # Is login required? True or False.
 FORM_LOGIN = False
 # Login username
