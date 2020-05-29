@@ -6,9 +6,9 @@ from scrapy.http import Request
 
 # TODO: Please provide values for the following variables
 # Domains only, no urls
-ALLOWED_DOMAINS = ['']
+ALLOWED_DOMAINS = ['filosofiki.eu']
 # Starting urls
-START_URLS = ['']
+START_URLS = ['http://www.filosofiki.eu/viewforum.php?f=67&sid=17575a200a6f183f559b696701c4ea20']
 # Is login required? True or False.
 FORM_LOGIN = False
 # Login username
@@ -30,6 +30,11 @@ class PhpbbSpider(scrapy.Spider):
         password = PASSWORD
         login_url = LOGIN_URL
         start_urls.insert(0, login_url)
+
+    username_xpath = '//p[contains(@class, "author")]//a[contains(@class, "username")]//text()'
+    post_count_xpath = '//dd[@class="profile-posts" or not(@class)]//a/text()'
+    post_time_xpath = '//div[@class="postbody"]//time/@datetime|//div[@class="postbody"]//p[@class="author"]/text()[2]'
+    post_text_xpath = '//div[@class="postbody"]//div[@class="content"]'
 
     def parse(self, response):
         # LOGIN TO PHPBB BOARD AND CALL AFTER_LOGIN
@@ -78,7 +83,7 @@ class PhpbbSpider(scrapy.Spider):
         block_quotes = soup.find_all('blockquote')
         for i, quote in enumerate(block_quotes):
             block_quotes[i] = '<quote-%s>=%s' % (str(i + 1), quote.get_text())
-        return ''.join(block_quotes)
+        return ''.join(block_quotes).strip()
     
     def clean_text(self, string):
         # CLEAN HTML TAGS FROM POST TEXT, MARK REPLIES TO QUOTES
@@ -87,27 +92,24 @@ class PhpbbSpider(scrapy.Spider):
         for tag in tags:
             for i, item in enumerate(soup.find_all(tag)):
                 item.replaceWith('<reply-%s>=' % str(i + 1))
-        return re.sub(r' +', r' ', soup.get_text())
+        return re.sub(r' +', r' ', soup.get_text()).strip()
       
     def parse_posts(self, response):
         # COLLECT FORUM POST DATA
-        usernames = response.xpath('//p[@class="author"]//a[@class="username"]//text()').extract()
-        post_counts = response.xpath('//dd[@class="profile-posts"]//a/text()').extract()
-        post_times = response.xpath('//div[@class="postbody"]//time/@datetime').extract()
-        post_texts = response.xpath('//div[@class="postbody"]//div[@class="content"]').extract()
-        post_quotes = [self.clean_quote(s) for s in post_texts]
-        post_texts = [self.clean_text(s) for s in post_texts]
+        usernames = response.xpath(self.username_xpath).extract()
+        n = len(usernames)
+        if n > 0:
+            post_counts = response.xpath(self.post_count_xpath).extract() or (n * [''])
+            post_times = response.xpath(self.post_time_xpath).extract() or (n * [''])
+            post_texts = response.xpath(self.post_text_xpath).extract() or (n * [''])
+            post_quotes = [self.clean_quote(s) for s in post_texts]
+            post_texts = [self.clean_text(s) for s in post_texts]
 
-        # YIELD POST DATA
-        for i in range(len(usernames)):
-            yield {
-                'Username': usernames[i],
-                'PostCount': post_counts[i],
-                'PostTime': post_times[i],
-                'PostText': post_texts[i],
-                'QuoteText': post_quotes[i]
-            }
-        
+            # YIELD POST DATA
+            for i in range(n):
+                yield {'Username': str(usernames[i]).strip(), 'PostCount': str(post_counts[i]).strip(),
+                       'PostTime': str(post_times[i]).strip(), 'PostText': post_texts[i], 'QuoteText': post_quotes[i]}
+
         # CLICK THROUGH NEXT PAGE
         next_link = response.xpath('//li[@class="next"]//a[@rel="next"]/@href').extract_first()
         if next_link:
